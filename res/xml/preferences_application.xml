@@ -17,6 +17,16 @@
 <!-- Preference screen definition for Bugle's application-wide settings -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <Preference
+        android:key="@string/nudge_friends_pref_key"
+        android:title="@string/nudge_friends_title"
+        android:persistent="false" />
+
+    <Preference
+        android:key="@string/safety_pref_key"
+        android:title="@string/safety_title"
+        android:persistent="false" />
+
     <PreferenceScreen
         android:key="@string/sms_disabled_pref_key"
         android:title="@string/sms_disabled_pref_title"

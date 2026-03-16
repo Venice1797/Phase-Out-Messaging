@@ -16,7 +16,7 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- The name of the application as it appears under the main Launcher icon and in various activity titles -->
-    <string name="app_name">Messaging</string>
+    <string name="app_name">PO Messaging</string>
 
     <!-- The name of the application as it appears in external share intent dialogs -->
     <string name="share_intent_label">Messaging</string>
@@ -549,6 +549,12 @@
     <string name="action_people_and_options">People &amp; options</string>
     <!-- Option menu item in the conversation list view and conversation view that shows debug menu -->
     <string name="action_debug_options">Debug</string>
+    <string name="action_about">About</string>
+    <string name="app_version_label">Version</string>
+    <string name="nudge_friends_pref_key">nudge_friends</string>
+    <string name="nudge_friends_title">Nudge Friends to use Signal</string>
+    <string name="safety_pref_key">safety</string>
+    <string name="safety_title">Safety</string>
     <!-- Title for the "People and Options" activity -->
     <string name="people_and_options_activity_title">People &amp; options</string>
     <!-- Title for the general settings section in the "People and options" activity -->

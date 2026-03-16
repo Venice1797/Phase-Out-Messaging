@@ -16,15 +16,18 @@
 
 package com.android.messaging.ui.conversationlist;
 
+import android.app.AlertDialog;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.android.messaging.BuildConfig;
 import com.android.messaging.R;
 import com.android.messaging.ui.UIIntents;
 import com.android.messaging.util.DebugUtils;
 import com.android.messaging.util.Trace;
+import com.android.messaging.util.VersionUtil;
 
 import androidx.appcompat.app.ActionBar;
 
@@ -106,6 +109,10 @@ public class ConversationListActivity extends AbstractConversationListActivity {
             onActionBarBlockedParticipants();
             return true;
         }
+        if (itemId == R.id.action_about) {
+            showAboutDialog();
+            return true;
+        }
         return super.onOptionsItemSelected(menuItem);
     }
 
@@ -146,5 +153,13 @@ public class ConversationListActivity extends AbstractConversationListActivity {
         if (hasFocus && conversationListFragment != null) {
             conversationListFragment.setScrolledToNewestConversationIfNeeded();
         }
+    }
+
+    private void showAboutDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.app_name))
+                .setMessage(getString(R.string.app_version_label) + " " + BuildConfig.VERSION_NAME)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
     }
 }

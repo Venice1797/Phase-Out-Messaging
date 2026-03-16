@@ -118,6 +118,26 @@ public class ApplicationSettingsActivity extends BugleActionBarActivity {
                 return false;
             });
 
+            final Preference nudgeFriendsPreference =
+                    findPreference(getString(R.string.nudge_friends_pref_key));
+            if (nudgeFriendsPreference != null) {
+                nudgeFriendsPreference.setOnPreferenceClickListener(preference -> {
+                    Intent intent = new Intent(getActivity(), NudgeFriendsActivity.class);
+                    startActivity(intent);
+                    return true;
+                });
+            }
+
+            final Preference safetyPreference =
+                    findPreference(getString(R.string.safety_pref_key));
+            if (safetyPreference != null) {
+                safetyPreference.setOnPreferenceClickListener(preference -> {
+                    Intent intent = new Intent(getActivity(), SafetyActivity.class);
+                    startActivity(intent);
+                    return true;
+                });
+            }
+
             if (!DebugUtils.isDebugEnabled()) {
                 final Preference debugCategory = findPreference(getString(
                         R.string.debug_pref_key));

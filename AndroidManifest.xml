@@ -204,6 +204,24 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.appsettings.NudgeFriendsActivity"
+            android:exported="false"
+            android:label="@string/nudge_friends_title"
+            android:theme="@style/BugleTheme.SettingsActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="user"
+            android:parentActivityName="com.android.messaging.ui.appsettings.ApplicationSettingsActivity" />
+
+        <activity
+            android:name=".ui.appsettings.SafetyActivity"
+            android:exported="false"
+            android:label="@string/safety_title"
+            android:theme="@style/BugleTheme.SettingsActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:screenOrientation="user"
+            android:parentActivityName="com.android.messaging.ui.appsettings.ApplicationSettingsActivity" />
+
         <!-- Handles sharing intent -->
         <activity
             android:name=".ui.conversationlist.ShareIntentActivity"

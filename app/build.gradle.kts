@@ -16,8 +16,11 @@ android {
     buildToolsVersion = "36.1.0"
 
     namespace = "com.android.messaging"
+    // applicationId is what identifies the app on-device / Play Store
+    // (separate from namespace so all existing source imports remain valid)
 
     defaultConfig {
+        applicationId = "com.po.messaging"
         versionCode = 20000000 + 13
         versionName = "13"
         minSdk = 35
@@ -81,7 +84,7 @@ android {
 
         getByName("debug") {
             applicationIdSuffix = ".debug"
-            resValue("string", "app_name", "Messaging d")
+            resValue("string", "app_name", "PO Messaging d")
         }
     }
 
