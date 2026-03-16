@@ -12,35 +12,19 @@
         android:paddingTop="16dp"
         android:paddingBottom="16dp">
 
-        <!-- "Tell me more…" button row -->
-        <LinearLayout
+        <!-- "Tell me more…" button -->
+        <Button
             android:id="@+id/nudge_tell_me_more_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="?android:attr/selectableItemBackground"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:paddingEnd="8dp">
-
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_warning"
-                android:contentDescription="@string/nudge_warning_icon_description" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/nudge_tell_me_more"
-                android:textSize="16sp"
-                android:textColor="?android:attr/textColorPrimary"
-                android:paddingStart="8dp" />
-
-        </LinearLayout>
+            android:text="@string/nudge_tell_me_more"
+            android:drawableStart="@drawable/ic_info"
+            android:drawableTint="#FFFFFF"
+            android:drawablePadding="8dp"
+            android:backgroundTint="#006FFF"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            style="?android:attr/buttonStyle" />
 
         <!-- Divider -->
         <View
@@ -110,6 +94,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/nudge_reset_message"
+            android:backgroundTint="#006FFF"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
             style="?android:attr/buttonStyle" />
 
         <!-- Divider -->
@@ -149,6 +136,9 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/nudge_reset_message"
+            android:backgroundTint="#006FFF"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
             style="?android:attr/buttonStyle" />
 
     </LinearLayout>

@@ -193,6 +193,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/short_nudge_button"
+                android:backgroundTint="#006FFF"
+                android:textColor="#FFFFFF"
+                android:textAllCaps="false"
                 style="?android:attr/buttonStyle" />
 
             <View
@@ -205,6 +208,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/long_nudge_button"
+                android:backgroundTint="#006FFF"
+                android:textColor="#FFFFFF"
+                android:textAllCaps="false"
                 style="?android:attr/buttonStyle" />
 
         </LinearLayout>

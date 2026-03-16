@@ -17,6 +17,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- The name of the application as it appears under the main Launcher icon and in various activity titles -->
     <string name="app_name">PO Messaging</string>
+    <string name="conversation_list_title">Phase Out Messaging</string>
 
     <!-- The name of the application as it appears in external share intent dialogs -->
     <string name="share_intent_label">Messaging</string>
@@ -553,7 +554,7 @@
     <string name="app_version_label">Version</string>
     <string name="nudge_friends_pref_key">nudge_friends</string>
     <string name="nudge_friends_title">Nudge your friends</string>
-    <string name="nudge_tell_me_more">Tell me more\u2026</string>
+    <string name="nudge_tell_me_more">Learn more\u2026</string>
     <string name="nudge_warning_icon_description">Warning</string>
     <string name="nudge_privacy_app_section">Recommended privacy app</string>
     <string name="nudge_privacy_app_default">Signal</string>

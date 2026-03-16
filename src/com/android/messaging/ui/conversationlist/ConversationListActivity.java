@@ -44,7 +44,7 @@ public class ConversationListActivity extends AbstractConversationListActivity {
 
     @Override
     protected void updateActionBar(final ActionBar actionBar) {
-        actionBar.setTitle(getString(R.string.app_name));
+        actionBar.setTitle(getString(R.string.conversation_list_title));
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);

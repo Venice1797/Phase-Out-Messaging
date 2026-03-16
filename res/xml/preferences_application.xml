@@ -60,4 +60,6 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="" />
+
 </PreferenceScreen>

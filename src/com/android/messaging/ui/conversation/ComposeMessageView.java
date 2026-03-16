@@ -331,8 +331,9 @@ public class ComposeMessageView extends LinearLayout
                                 .PREF_SHORT_NUDGE_MESSAGE,
                         "Reminder to contact me on " + defaultMsg
                                 + ", I will try to reply back briefly.");
-                mComposeEditText.setText(msg);
-                mComposeEditText.setSelection(msg.length());
+                int cursor = mComposeEditText.getSelectionStart();
+                if (cursor < 0) cursor = mComposeEditText.getText().length();
+                mComposeEditText.getText().insert(cursor, msg);
                 mShortNudgeButton.setEnabled(false);
             }
         });
@@ -354,8 +355,9 @@ public class ComposeMessageView extends LinearLayout
                         com.android.messaging.ui.appsettings.NudgeFriendsActivity
                                 .PREF_LONG_NUDGE_MESSAGE,
                         defaultMsg);
-                mComposeEditText.setText(msg);
-                mComposeEditText.setSelection(msg.length());
+                int cursor = mComposeEditText.getSelectionStart();
+                if (cursor < 0) cursor = mComposeEditText.getText().length();
+                mComposeEditText.getText().insert(cursor, msg);
                 mLongNudgeButton.setEnabled(false);
             }
         });
