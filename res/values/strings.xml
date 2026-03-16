@@ -555,6 +555,11 @@
     <string name="nudge_friends_title">Nudge Friends to use Signal</string>
     <string name="safety_pref_key">safety</string>
     <string name="safety_title">Safety</string>
+    <string name="auto_delete_section_title">Auto Delete</string>
+    <string name="auto_delete_toggle_label">Auto Delete</string>
+    <string name="auto_delete_days_label">days</string>
+    <string name="auto_delete_info_description">Auto Delete information</string>
+    <string name="auto_delete_info_text">Auto delete messages that are older than the set number of days</string>
     <!-- Title for the "People and Options" activity -->
     <string name="people_and_options_activity_title">People &amp; options</string>
     <!-- Title for the general settings section in the "People and options" activity -->
