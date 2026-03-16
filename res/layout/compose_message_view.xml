@@ -178,6 +178,37 @@
         </LinearLayout>
     </LinearLayout>
 
+        <!-- Nudge buttons row -->
+        <LinearLayout
+            android:id="@+id/nudge_buttons_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingTop="4dp">
+
+            <Button
+                android:id="@+id/short_nudge_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/short_nudge_button"
+                style="?android:attr/buttonStyle" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/long_nudge_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/long_nudge_button"
+                style="?android:attr/buttonStyle" />
+
+        </LinearLayout>
+
     <FrameLayout
         android:id="@+id/mediapicker_container"
         android:layout_width="match_parent"

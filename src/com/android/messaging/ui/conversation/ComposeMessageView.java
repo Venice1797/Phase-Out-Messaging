@@ -122,6 +122,8 @@ public class ComposeMessageView extends LinearLayout
     private ImageButton mSendButton;
     private View mSubjectView;
     private ImageButton mDeleteSubjectButton;
+    private android.widget.Button mShortNudgeButton;
+    private android.widget.Button mLongNudgeButton;
     private AttachmentPreview mAttachmentPreview;
     private ImageButton mAttachMediaButton;
 
@@ -315,6 +317,48 @@ public class ComposeMessageView extends LinearLayout
 
         mMessageBodySize = (TextView) findViewById(R.id.message_body_size);
         mMmsIndicator = (TextView) findViewById(R.id.mms_indicator);
+
+        mShortNudgeButton = (android.widget.Button) findViewById(R.id.short_nudge_button);
+        mShortNudgeButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                final android.content.SharedPreferences prefs = getContext()
+                        .getSharedPreferences(BuglePrefs.SHARED_PREFERENCES_NAME,
+                                android.content.Context.MODE_PRIVATE);
+                final String defaultMsg = getContext().getString(R.string.nudge_privacy_app_default);
+                final String msg = prefs.getString(
+                        com.android.messaging.ui.appsettings.NudgeFriendsActivity
+                                .PREF_SHORT_NUDGE_MESSAGE,
+                        "Reminder to contact me on " + defaultMsg
+                                + ", I will try to reply back briefly.");
+                mComposeEditText.setText(msg);
+                mComposeEditText.setSelection(msg.length());
+                mShortNudgeButton.setEnabled(false);
+            }
+        });
+
+        mLongNudgeButton = (android.widget.Button) findViewById(R.id.long_nudge_button);
+        mLongNudgeButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                final android.content.SharedPreferences prefs = getContext()
+                        .getSharedPreferences(BuglePrefs.SHARED_PREFERENCES_NAME,
+                                android.content.Context.MODE_PRIVATE);
+                final String defaultApp = getContext().getString(R.string.nudge_privacy_app_default);
+                final String defaultMsg =
+                        "SMS/MMS/RCS are insecure and exposed to Big Tech, carriers, and hackers.\n"
+                        + "Let\u2019s switch to " + defaultApp + " for real privacy.\n"
+                        + "I\u2019ll keep replies here brief until we move our chat to "
+                        + defaultApp + ".";
+                final String msg = prefs.getString(
+                        com.android.messaging.ui.appsettings.NudgeFriendsActivity
+                                .PREF_LONG_NUDGE_MESSAGE,
+                        defaultMsg);
+                mComposeEditText.setText(msg);
+                mComposeEditText.setSelection(msg.length());
+                mLongNudgeButton.setEnabled(false);
+            }
+        });
     }
 
     private void hideAttachmentsWhenShowingSims(final boolean simPickerVisible) {
@@ -880,6 +924,14 @@ public class ComposeMessageView extends LinearLayout
 
     @Override
     public void afterTextChanged(final Editable editable) {
+        if (editable.length() == 0) {
+            if (mShortNudgeButton != null && !mShortNudgeButton.isEnabled()) {
+                mShortNudgeButton.setEnabled(true);
+            }
+            if (mLongNudgeButton != null && !mLongNudgeButton.isEnabled()) {
+                mLongNudgeButton.setEnabled(true);
+            }
+        }
     }
 
     @Override

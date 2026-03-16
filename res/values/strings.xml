@@ -558,7 +558,10 @@
     <string name="nudge_privacy_app_section">Recommended privacy app</string>
     <string name="nudge_privacy_app_default">Signal</string>
     <string name="nudge_message_section">A short nudge message</string>
+    <string name="short_nudge_button">Short nudge</string>
+    <string name="long_nudge_button">Long nudge</string>
     <string name="nudge_reset_message">Reset message</string>
+    <string name="nudge_long_message_section">A longer nudge message</string>
     <string name="safety_pref_key">safety</string>
     <string name="safety_title">Privacy</string>
     <string name="auto_delete_section_title">Auto delete</string>

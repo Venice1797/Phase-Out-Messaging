@@ -4,6 +4,7 @@
 
 package com.android.messaging.ui.appsettings;
 
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Editable;
@@ -22,19 +23,25 @@ import android.widget.TextView;
 
 import com.android.messaging.R;
 import com.android.messaging.ui.BugleActionBarActivity;
+import com.android.messaging.util.BuglePrefs;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.NavUtils;
 
 public class NudgeFriendsActivity extends BugleActionBarActivity {
 
+    public static final String PREF_SHORT_NUDGE_MESSAGE = "short_nudge_message";
+    public static final String PREF_LONG_NUDGE_MESSAGE  = "long_nudge_message";
+
     private EditText mPrivacyAppField;
     private EditText mNudgeMessageField;
+    private EditText mLongNudgeMessageField;
+    private SharedPreferences mPrefs;
 
-    /** True while we are programmatically setting mNudgeMessageField to suppress its watcher. */
-    private boolean mUpdatingMessage = false;
-    /** True once the user has manually edited the nudge message. */
-    private boolean mNudgeMessageEdited = false;
+    private boolean mUpdatingMessage     = false;
+    private boolean mNudgeMessageEdited  = false;
+    private boolean mUpdatingLongMessage    = false;
+    private boolean mLongMessageEdited      = false;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -43,27 +50,52 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getString(R.string.nudge_friends_title));
 
-        mPrivacyAppField = findViewById(R.id.nudge_privacy_app_field);
-        mNudgeMessageField = findViewById(R.id.nudge_message_field);
+        mPrefs = getSharedPreferences(BuglePrefs.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
 
-        // Set initial nudge message
-        setNudgeMessage(mPrivacyAppField.getText().toString().trim());
+        mPrivacyAppField      = findViewById(R.id.nudge_privacy_app_field);
+        mNudgeMessageField    = findViewById(R.id.nudge_message_field);
+        mLongNudgeMessageField = findViewById(R.id.nudge_long_message_field);
 
-        // When the app name changes, keep the nudge message in sync (unless user has edited it)
+        // ── Short message: restore or generate default ───────────────────────
+        final String savedShort = mPrefs.getString(PREF_SHORT_NUDGE_MESSAGE, null);
+        if (savedShort != null) {
+            mUpdatingMessage = true;
+            mNudgeMessageField.setText(savedShort);
+            mUpdatingMessage = false;
+            mNudgeMessageEdited = true;
+        } else {
+            setShortNudgeMessage(mPrivacyAppField.getText().toString().trim());
+        }
+
+        // ── Long message: restore or generate default ────────────────────────
+        final String savedLong = mPrefs.getString(PREF_LONG_NUDGE_MESSAGE, null);
+        if (savedLong != null) {
+            mUpdatingLongMessage = true;
+            mLongNudgeMessageField.setText(savedLong);
+            mUpdatingLongMessage = false;
+            mLongMessageEdited = true;
+        } else {
+            setLongNudgeMessage(mPrivacyAppField.getText().toString().trim());
+        }
+
+        // ── App name changes → sync both messages (if not manually edited) ───
         mPrivacyAppField.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(final Editable s) {
+                final String appName = s.toString().trim().isEmpty()
+                        ? getString(R.string.nudge_privacy_app_default) : s.toString().trim();
                 if (!mNudgeMessageEdited) {
-                    final String appName = s.toString().trim();
-                    setNudgeMessage(appName.isEmpty()
-                            ? getString(R.string.nudge_privacy_app_default) : appName);
+                    setShortNudgeMessage(appName);
+                }
+                if (!mLongMessageEdited) {
+                    setLongNudgeMessage(appName);
                 }
             }
         });
 
-        // Track manual edits to the nudge message field
+        // ── Short message: track edits and persist ───────────────────────────
         mNudgeMessageField.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -72,30 +104,68 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
                 if (!mUpdatingMessage) {
                     mNudgeMessageEdited = true;
                 }
+                mPrefs.edit().putString(PREF_SHORT_NUDGE_MESSAGE, s.toString()).apply();
             }
         });
 
-        // Reset button: restore default message and resume auto-sync
-        final Button resetButton = findViewById(R.id.nudge_reset_message_button);
-        resetButton.setOnClickListener(v -> {
+        // ── Long message: track edits and persist ────────────────────────────
+        mLongNudgeMessageField.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(final Editable s) {
+                if (!mUpdatingLongMessage) {
+                    mLongMessageEdited = true;
+                }
+                mPrefs.edit().putString(PREF_LONG_NUDGE_MESSAGE, s.toString()).apply();
+            }
+        });
+
+        // ── Short reset button ───────────────────────────────────────────────
+        findViewById(R.id.nudge_reset_message_button).setOnClickListener(v -> {
             mNudgeMessageEdited = false;
-            final String appName = mPrivacyAppField.getText().toString().trim();
-            setNudgeMessage(appName.isEmpty()
-                    ? getString(R.string.nudge_privacy_app_default) : appName);
+            final String appName = resolvedAppName();
+            setShortNudgeMessage(appName);
+            mPrefs.edit().putString(PREF_SHORT_NUDGE_MESSAGE, buildShortNudgeMessage(appName)).apply();
+        });
+
+        // ── Long reset button ────────────────────────────────────────────────
+        findViewById(R.id.nudge_reset_long_message_button).setOnClickListener(v -> {
+            mLongMessageEdited = false;
+            final String appName = resolvedAppName();
+            setLongNudgeMessage(appName);
+            mPrefs.edit().putString(PREF_LONG_NUDGE_MESSAGE, buildLongNudgeMessage(appName)).apply();
         });
 
         findViewById(R.id.nudge_tell_me_more_button).setOnClickListener(v -> showHelpDialog());
     }
 
-    private void setNudgeMessage(final String appName) {
+    private String resolvedAppName() {
+        final String name = mPrivacyAppField.getText().toString().trim();
+        return name.isEmpty() ? getString(R.string.nudge_privacy_app_default) : name;
+    }
+
+    private void setShortNudgeMessage(final String appName) {
         mUpdatingMessage = true;
-        mNudgeMessageField.setText(buildNudgeMessage(appName));
+        mNudgeMessageField.setText(buildShortNudgeMessage(appName));
         mUpdatingMessage = false;
     }
 
-    private String buildNudgeMessage(final String appName) {
+    private void setLongNudgeMessage(final String appName) {
+        mUpdatingLongMessage = true;
+        mLongNudgeMessageField.setText(buildLongNudgeMessage(appName));
+        mUpdatingLongMessage = false;
+    }
+
+    private String buildShortNudgeMessage(final String appName) {
         return "Reminder to contact me on " + appName
                 + ", I will try to reply back briefly.";
+    }
+
+    private String buildLongNudgeMessage(final String appName) {
+        return "SMS/MMS/RCS are insecure and exposed to Big Tech, carriers, and hackers.\n"
+                + "Let\u2019s switch to " + appName + " for real privacy.\n"
+                + "I\u2019ll keep replies here brief until we move our chat to " + appName + ".";
     }
 
     /**
