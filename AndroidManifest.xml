@@ -452,6 +452,15 @@
             </intent-filter>
         </receiver>
 
+        <!-- Broadcast receiver for daily auto-delete alarm -->
+        <receiver
+            android:name=".receiver.AutoDeleteReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.po.messaging.action.AUTO_DELETE"/>
+            </intent-filter>
+        </receiver>
+
         <!-- Broadcast receiver that will be notified to reset notifications -->
         <receiver
             android:name=".receiver.NotificationReceiver"

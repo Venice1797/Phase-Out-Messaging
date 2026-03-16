@@ -11,6 +11,7 @@ import android.widget.EditText;
 
 import com.android.messaging.R;
 import com.android.messaging.ui.BugleActionBarActivity;
+import com.android.messaging.util.AutoDeleteScheduler;
 import com.android.messaging.util.BuglePrefs;
 
 import androidx.appcompat.app.AlertDialog;
@@ -19,9 +20,12 @@ import androidx.core.app.NavUtils;
 
 public class SafetyActivity extends BugleActionBarActivity {
 
-    private static final String PREF_AUTO_DELETE_ENABLED = "auto_delete_enabled";
-    private static final String PREF_AUTO_DELETE_DAYS = "auto_delete_days";
-    private static final int DEFAULT_AUTO_DELETE_DAYS = 14;
+    private SwitchCompat mAutoDeleteSwitch;
+    private EditText mAutoDeleteDaysField;
+    private SharedPreferences mPrefs;
+
+    // Guard against re-entrant setChecked() calls triggering the listener.
+    private boolean mSettingSwitch = false;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -30,34 +34,71 @@ public class SafetyActivity extends BugleActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getString(R.string.safety_title));
 
-        final SharedPreferences prefs = getSharedPreferences(
-                BuglePrefs.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        mPrefs = getSharedPreferences(BuglePrefs.SHARED_PREFERENCES_NAME, MODE_PRIVATE);
+        mAutoDeleteSwitch = findViewById(R.id.auto_delete_switch);
+        mAutoDeleteDaysField = findViewById(R.id.auto_delete_days_field);
 
-        final SwitchCompat autoDeleteSwitch = findViewById(R.id.auto_delete_switch);
-        final EditText autoDeleteDaysField = findViewById(R.id.auto_delete_days_field);
+        final boolean enabled = mPrefs.getBoolean(AutoDeleteScheduler.PREF_AUTO_DELETE_ENABLED, false);
+        final int days = mPrefs.getInt(AutoDeleteScheduler.PREF_AUTO_DELETE_DAYS,
+                AutoDeleteScheduler.DEFAULT_DAYS);
 
-        final boolean autoDeleteEnabled = prefs.getBoolean(PREF_AUTO_DELETE_ENABLED, false);
-        final int autoDeleteDays = prefs.getInt(PREF_AUTO_DELETE_DAYS, DEFAULT_AUTO_DELETE_DAYS);
+        mAutoDeleteSwitch.setChecked(enabled);
+        mAutoDeleteDaysField.setText(String.valueOf(days));
+        mAutoDeleteDaysField.setEnabled(enabled);
 
-        autoDeleteSwitch.setChecked(autoDeleteEnabled);
-        autoDeleteDaysField.setText(String.valueOf(autoDeleteDays));
-        autoDeleteDaysField.setEnabled(autoDeleteEnabled);
+        mAutoDeleteSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (mSettingSwitch) return;
 
-        autoDeleteSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            autoDeleteDaysField.setEnabled(isChecked);
-            prefs.edit().putBoolean(PREF_AUTO_DELETE_ENABLED, isChecked).apply();
+            if (isChecked) {
+                final int currentDays = parseDays(mAutoDeleteDaysField.getText().toString());
+                showConfirmation(currentDays,
+                        /* onConfirm */ () -> {
+                            mAutoDeleteDaysField.setEnabled(true);
+                            mPrefs.edit()
+                                    .putBoolean(AutoDeleteScheduler.PREF_AUTO_DELETE_ENABLED, true)
+                                    .putInt(AutoDeleteScheduler.PREF_AUTO_DELETE_DAYS, currentDays)
+                                    .apply();
+                            AutoDeleteScheduler.runNow(currentDays);
+                            AutoDeleteScheduler.scheduleNext(this);
+                        },
+                        /* onCancel */ () -> {
+                            mSettingSwitch = true;
+                            mAutoDeleteSwitch.setChecked(false);
+                            mSettingSwitch = false;
+                        });
+            } else {
+                mAutoDeleteDaysField.setEnabled(false);
+                mPrefs.edit()
+                        .putBoolean(AutoDeleteScheduler.PREF_AUTO_DELETE_ENABLED, false)
+                        .apply();
+                AutoDeleteScheduler.cancel(this);
+            }
         });
 
-        autoDeleteDaysField.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                final String text = autoDeleteDaysField.getText().toString();
-                final int days = text.isEmpty() ? DEFAULT_AUTO_DELETE_DAYS
-                        : Integer.parseInt(text);
-                if (text.isEmpty()) {
-                    autoDeleteDaysField.setText(String.valueOf(DEFAULT_AUTO_DELETE_DAYS));
-                }
-                prefs.edit().putInt(PREF_AUTO_DELETE_DAYS, days).apply();
-            }
+        mAutoDeleteDaysField.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) return;
+            if (!mAutoDeleteSwitch.isChecked()) return;
+
+            final String text = mAutoDeleteDaysField.getText().toString();
+            final int newDays = parseDays(text);
+            final int savedDays = mPrefs.getInt(AutoDeleteScheduler.PREF_AUTO_DELETE_DAYS,
+                    AutoDeleteScheduler.DEFAULT_DAYS);
+
+            if (newDays == savedDays) return; // No change — nothing to confirm.
+
+            // Ensure the field shows a valid value while the dialog is open.
+            mAutoDeleteDaysField.setText(String.valueOf(newDays));
+
+            showConfirmation(newDays,
+                    /* onConfirm */ () -> {
+                        mPrefs.edit()
+                                .putInt(AutoDeleteScheduler.PREF_AUTO_DELETE_DAYS, newDays)
+                                .apply();
+                        AutoDeleteScheduler.runNow(newDays);
+                        AutoDeleteScheduler.scheduleNext(this);
+                    },
+                    /* onCancel */ () ->
+                            mAutoDeleteDaysField.setText(String.valueOf(savedDays)));
         });
 
         findViewById(R.id.auto_delete_info_button).setOnClickListener(v ->
@@ -65,6 +106,33 @@ public class SafetyActivity extends BugleActionBarActivity {
                         .setMessage(R.string.auto_delete_info_text)
                         .setPositiveButton(android.R.string.ok, null)
                         .show());
+    }
+
+    /**
+     * Show a confirmation dialog describing what will be deleted. Calls {@code onConfirm} if the
+     * user accepts, {@code onCancel} if they dismiss.
+     */
+    private void showConfirmation(final int days, final Runnable onConfirm,
+            final Runnable onCancel) {
+        final String message = getResources().getQuantityString(
+                R.plurals.auto_delete_confirm_message, days, days);
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.auto_delete_section_title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> onConfirm.run())
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> onCancel.run())
+                .setOnCancelListener(dialog -> onCancel.run())
+                .show();
+    }
+
+    /** Parse the days field; falls back to DEFAULT_DAYS if empty or zero. */
+    private int parseDays(final String text) {
+        try {
+            final int value = Integer.parseInt(text.trim());
+            return value > 0 ? value : AutoDeleteScheduler.DEFAULT_DAYS;
+        } catch (NumberFormatException e) {
+            return AutoDeleteScheduler.DEFAULT_DAYS;
+        }
     }
 
     @Override

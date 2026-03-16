@@ -23,6 +23,8 @@ import android.content.Intent;
 import com.android.messaging.BugleApplication;
 import com.android.messaging.Factory;
 import com.android.messaging.datamodel.action.UpdateMessageNotificationAction;
+import com.android.messaging.util.AutoDeleteScheduler;
+import com.android.messaging.util.BuglePrefs;
 import com.android.messaging.util.BuglePrefsKeys;
 import com.android.messaging.util.LogUtil;
 
@@ -40,6 +42,14 @@ public class BootAndPackageReplacedReceiver extends BroadcastReceiver {
             UpdateMessageNotificationAction.updateMessageNotification();
 
             BugleApplication.updateAppConfig(context);
+
+            // Reschedule the daily auto-delete alarm (AlarmManager alarms don't survive reboot).
+            final boolean autoDeleteEnabled = context
+                    .getSharedPreferences(BuglePrefs.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+                    .getBoolean(AutoDeleteScheduler.PREF_AUTO_DELETE_ENABLED, false);
+            if (autoDeleteEnabled) {
+                AutoDeleteScheduler.scheduleNext(context);
+            }
         } else {
             LogUtil.i(LogUtil.BUGLE_TAG, "BootAndPackageReplacedReceiver got unexpected action: "
                     + intent.getAction());

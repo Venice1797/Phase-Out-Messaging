@@ -560,6 +560,10 @@
     <string name="auto_delete_days_label">days</string>
     <string name="auto_delete_info_description">Auto Delete information</string>
     <string name="auto_delete_info_text">Auto delete messages that are older than the set number of days</string>
+    <plurals name="auto_delete_confirm_message">
+        <item quantity="one">Messages older than 1 day will be permanently deleted. Continue?</item>
+        <item quantity="other">Messages older than %d days will be permanently deleted. Continue?</item>
+    </plurals>
     <!-- Title for the "People and Options" activity -->
     <string name="people_and_options_activity_title">People &amp; options</string>
     <!-- Title for the general settings section in the "People and options" activity -->
