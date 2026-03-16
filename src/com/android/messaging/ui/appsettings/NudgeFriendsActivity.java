@@ -13,8 +13,11 @@ import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.TypefaceSpan;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -32,6 +35,10 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
 
     public static final String PREF_SHORT_NUDGE_MESSAGE = "short_nudge_message";
     public static final String PREF_LONG_NUDGE_MESSAGE  = "long_nudge_message";
+
+    private static final String[] APPROVED_APPS = {
+        "Signal", "Session", "SimpleX", "Briar", "Element"
+    };
 
     private EditText mPrivacyAppField;
     private EditText mNudgeMessageField;
@@ -77,6 +84,22 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
         } else {
             setLongNudgeMessage(mPrivacyAppField.getText().toString().trim());
         }
+
+        // ── App name field: warn if not on approved list (on Done or focus loss) ──
+        mPrivacyAppField.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE
+                    || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                hideKeyboard(mPrivacyAppField);
+                maybeWarnUnapprovedApp();
+                return true;
+            }
+            return false;
+        });
+        mPrivacyAppField.setOnFocusChangeListener((v, hasFocus) -> {
+            if (!hasFocus) {
+                maybeWarnUnapprovedApp();
+            }
+        });
 
         // ── App name changes → sync both messages (if not manually edited) ───
         mPrivacyAppField.addTextChangedListener(new TextWatcher() {
@@ -138,6 +161,35 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
         });
 
         findViewById(R.id.nudge_tell_me_more_button).setOnClickListener(v -> showHelpDialog());
+    }
+
+    private boolean isApprovedApp(final String name) {
+        final String normalized = name.trim();
+        for (final String approved : APPROVED_APPS) {
+            if (approved.equalsIgnoreCase(normalized)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void maybeWarnUnapprovedApp() {
+        final String entered = mPrivacyAppField.getText().toString().trim();
+        if (!entered.isEmpty() && !isApprovedApp(entered)) {
+            new AlertDialog.Builder(this)
+                    .setMessage("Use open-source or nothing. Proprietary apps will flip on your "
+                            + "privacy the moment a subpoena or profit motive hits their desk!")
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+        }
+    }
+
+    private void hideKeyboard(final View view) {
+        final InputMethodManager imm =
+                (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private String resolvedAppName() {
