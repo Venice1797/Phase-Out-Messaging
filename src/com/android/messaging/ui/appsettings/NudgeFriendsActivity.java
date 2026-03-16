@@ -6,12 +6,12 @@ package com.android.messaging.ui.appsettings;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.Spanned;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.TypefaceSpan;
-import android.text.Editable;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -31,6 +31,11 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
     private EditText mPrivacyAppField;
     private EditText mNudgeMessageField;
 
+    /** True while we are programmatically setting mNudgeMessageField to suppress its watcher. */
+    private boolean mUpdatingMessage = false;
+    /** True once the user has manually edited the nudge message. */
+    private boolean mNudgeMessageEdited = false;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,18 +46,51 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
         mPrivacyAppField = findViewById(R.id.nudge_privacy_app_field);
         mNudgeMessageField = findViewById(R.id.nudge_message_field);
 
-        // Set initial nudge message using the default app name
-        mNudgeMessageField.setText(buildNudgeMessage(mPrivacyAppField.getText().toString().trim()));
+        // Set initial nudge message
+        setNudgeMessage(mPrivacyAppField.getText().toString().trim());
 
-        // Reset button restores the default message using the current app name
+        // When the app name changes, keep the nudge message in sync (unless user has edited it)
+        mPrivacyAppField.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(final Editable s) {
+                if (!mNudgeMessageEdited) {
+                    final String appName = s.toString().trim();
+                    setNudgeMessage(appName.isEmpty()
+                            ? getString(R.string.nudge_privacy_app_default) : appName);
+                }
+            }
+        });
+
+        // Track manual edits to the nudge message field
+        mNudgeMessageField.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(final Editable s) {
+                if (!mUpdatingMessage) {
+                    mNudgeMessageEdited = true;
+                }
+            }
+        });
+
+        // Reset button: restore default message and resume auto-sync
         final Button resetButton = findViewById(R.id.nudge_reset_message_button);
         resetButton.setOnClickListener(v -> {
+            mNudgeMessageEdited = false;
             final String appName = mPrivacyAppField.getText().toString().trim();
-            mNudgeMessageField.setText(buildNudgeMessage(appName.isEmpty()
-                    ? getString(R.string.nudge_privacy_app_default) : appName));
+            setNudgeMessage(appName.isEmpty()
+                    ? getString(R.string.nudge_privacy_app_default) : appName);
         });
 
         findViewById(R.id.nudge_tell_me_more_button).setOnClickListener(v -> showHelpDialog());
+    }
+
+    private void setNudgeMessage(final String appName) {
+        mUpdatingMessage = true;
+        mNudgeMessageField.setText(buildNudgeMessage(appName));
+        mUpdatingMessage = false;
     }
 
     private String buildNudgeMessage(final String appName) {
@@ -87,22 +125,22 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
         container.addView(spacer(dp8));
 
         // ── Bullet items ────────────────────────────────────────────────────
-        addBullet(container, "Cybercriminal Target:",
+        addBullet(container, "Cybercriminal target:",
                 "Legacy protocols like SMS/MMS are playground for hackers, enabling SIM swapping,"
                 + " phishing, and interception of your private codes and conversations.",
                 dp8, dp24);
 
-        addBullet(container, "Closed Infrastructure:",
+        addBullet(container, "Closed infrastructure:",
                 "RCS is a \u201cwalled garden\u201d with zero transparency, making it prone to"
                 + " provider-side exploits that you can neither see nor fix.",
                 dp8, dp24);
 
-        addBullet(container, "Data Exploitation:",
+        addBullet(container, "Data exploitation:",
                 "Corporations harvest your metadata to fuel their own profit margins, turning your"
                 + " private habits into a commodity.",
                 dp8, dp24);
 
-        addBullet(container, "Government Compliance:",
+        addBullet(container, "Government compliance:",
                 "These centralized entities are engineered to be compliant; they routinely crack"
                 + " under government pressure, handing over your data via secret subpoenas without"
                 + " a fight.",
@@ -165,6 +203,7 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
         final TextView tv = new TextView(this);
         tv.setTextSize(textSizeSp);
         tv.setTypeface(typeface);
+        tv.setTextIsSelectable(true);
         return tv;
     }
 

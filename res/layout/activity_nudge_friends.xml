@@ -70,7 +70,8 @@
             android:imeOptions="actionDone"
             android:text="@string/nudge_privacy_app_default"
             android:textSize="16sp"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:background="@drawable/edit_text_border" />
 
         <!-- Divider -->
         <View
@@ -99,7 +100,8 @@
             android:inputType="textMultiLine|textCapSentences"
             android:minLines="3"
             android:gravity="top|start"
-            android:textSize="15sp" />
+            android:textSize="15sp"
+            android:background="@drawable/edit_text_border" />
 
         <!-- Reset message button -->
         <Button
@@ -108,7 +110,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="@string/nudge_reset_message"
-            style="?android:attr/borderlessButtonStyle" />
+            style="?android:attr/buttonStyle" />
 
     </LinearLayout>
 
