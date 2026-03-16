@@ -555,6 +555,10 @@
     <string name="nudge_friends_title">Nudge Your Friends</string>
     <string name="nudge_tell_me_more">Tell me more\u2026</string>
     <string name="nudge_warning_icon_description">Warning</string>
+    <string name="nudge_privacy_app_section">Recommended Privacy App</string>
+    <string name="nudge_privacy_app_default">Signal</string>
+    <string name="nudge_message_section">A short nudge message</string>
+    <string name="nudge_reset_message">Reset message</string>
     <string name="safety_pref_key">safety</string>
     <string name="safety_title">Privacy</string>
     <string name="auto_delete_section_title">Auto Delete</string>

@@ -27,8 +27,8 @@
             android:paddingEnd="8dp">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/ic_warning"
                 android:contentDescription="@string/nudge_warning_icon_description" />
 
@@ -41,6 +41,74 @@
                 android:paddingStart="8dp" />
 
         </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
+            android:background="?android:attr/listDivider" />
+
+        <!-- "Recommended Privacy App" section heading -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nudge_privacy_app_section"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp" />
+
+        <!-- Privacy app name field -->
+        <EditText
+            android:id="@+id/nudge_privacy_app_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:imeOptions="actionDone"
+            android:text="@string/nudge_privacy_app_default"
+            android:textSize="16sp"
+            android:singleLine="true" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="4dp"
+            android:background="?android:attr/listDivider" />
+
+        <!-- "A short nudge message" section heading -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nudge_message_section"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary"
+            android:paddingTop="12dp"
+            android:paddingBottom="8dp" />
+
+        <!-- Nudge message field -->
+        <EditText
+            android:id="@+id/nudge_message_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine|textCapSentences"
+            android:minLines="3"
+            android:gravity="top|start"
+            android:textSize="15sp" />
+
+        <!-- Reset message button -->
+        <Button
+            android:id="@+id/nudge_reset_message_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/nudge_reset_message"
+            style="?android:attr/borderlessButtonStyle" />
 
     </LinearLayout>
 
