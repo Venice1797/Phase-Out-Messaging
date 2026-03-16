@@ -10,6 +10,8 @@ import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.view.MenuItem;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.android.messaging.R;
 import com.android.messaging.ui.BugleActionBarActivity;
@@ -26,11 +28,28 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(getString(R.string.nudge_friends_title));
 
-        findViewById(R.id.nudge_tell_me_more_button).setOnClickListener(v ->
-                new AlertDialog.Builder(this)
-                        .setMessage(buildHelpText())
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show());
+        findViewById(R.id.nudge_tell_me_more_button).setOnClickListener(v -> showHelpDialog());
+    }
+
+    /**
+     * Shows the help dialog using a custom TextView so that SpannableStringBuilder formatting
+     * (bold, size) is guaranteed to render — AlertDialog.setMessage() can strip spans internally.
+     */
+    private void showHelpDialog() {
+        final int dp16 = (int) (16 * getResources().getDisplayMetrics().density);
+
+        final TextView textView = new TextView(this);
+        textView.setText(buildHelpText());
+        textView.setTextSize(15);
+        textView.setPadding(dp16, dp16, dp16, dp16);
+
+        final ScrollView scrollView = new ScrollView(this);
+        scrollView.addView(textView);
+
+        new AlertDialog.Builder(this)
+                .setView(scrollView)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
     }
 
     /**
