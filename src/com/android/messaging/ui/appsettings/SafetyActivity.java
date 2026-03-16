@@ -6,7 +6,10 @@ package com.android.messaging.ui.appsettings;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.android.messaging.R;
@@ -75,30 +78,23 @@ public class SafetyActivity extends BugleActionBarActivity {
             }
         });
 
+        // Show the confirmation dialog when the user presses Done on the keyboard.
+        mAutoDeleteDaysField.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE
+                    || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                            && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                hideKeyboard();
+                maybeConfirmDaysChange();
+                return true;
+            }
+            return false;
+        });
+
+        // Fallback: also trigger when focus leaves the field (e.g. user taps elsewhere).
         mAutoDeleteDaysField.setOnFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus) return;
-            if (!mAutoDeleteSwitch.isChecked()) return;
-
-            final String text = mAutoDeleteDaysField.getText().toString();
-            final int newDays = parseDays(text);
-            final int savedDays = mPrefs.getInt(AutoDeleteScheduler.PREF_AUTO_DELETE_DAYS,
-                    AutoDeleteScheduler.DEFAULT_DAYS);
-
-            if (newDays == savedDays) return; // No change — nothing to confirm.
-
-            // Ensure the field shows a valid value while the dialog is open.
-            mAutoDeleteDaysField.setText(String.valueOf(newDays));
-
-            showConfirmation(newDays,
-                    /* onConfirm */ () -> {
-                        mPrefs.edit()
-                                .putInt(AutoDeleteScheduler.PREF_AUTO_DELETE_DAYS, newDays)
-                                .apply();
-                        AutoDeleteScheduler.runNow(newDays);
-                        AutoDeleteScheduler.scheduleNext(this);
-                    },
-                    /* onCancel */ () ->
-                            mAutoDeleteDaysField.setText(String.valueOf(savedDays)));
+            if (!hasFocus) {
+                maybeConfirmDaysChange();
+            }
         });
 
         findViewById(R.id.auto_delete_info_button).setOnClickListener(v ->
@@ -106,6 +102,40 @@ public class SafetyActivity extends BugleActionBarActivity {
                         .setMessage(R.string.auto_delete_info_text)
                         .setPositiveButton(android.R.string.ok, null)
                         .show());
+    }
+
+    /**
+     * If the toggle is ON and the days value has changed, prompt the user to confirm before
+     * persisting and executing. Guards against double-triggering from the editor action +
+     * subsequent focus-loss by checking whether the value actually differs from what's saved.
+     */
+    private void maybeConfirmDaysChange() {
+        if (!mAutoDeleteSwitch.isChecked()) return;
+
+        final int newDays = parseDays(mAutoDeleteDaysField.getText().toString());
+        final int savedDays = mPrefs.getInt(AutoDeleteScheduler.PREF_AUTO_DELETE_DAYS,
+                AutoDeleteScheduler.DEFAULT_DAYS);
+
+        if (newDays == savedDays) return; // Nothing changed.
+
+        // Normalise the field to the parsed value before the dialog opens.
+        mAutoDeleteDaysField.setText(String.valueOf(newDays));
+
+        showConfirmation(newDays,
+                /* onConfirm */ () -> {
+                    mPrefs.edit()
+                            .putInt(AutoDeleteScheduler.PREF_AUTO_DELETE_DAYS, newDays)
+                            .apply();
+                    AutoDeleteScheduler.runNow(newDays);
+                    AutoDeleteScheduler.scheduleNext(this);
+                },
+                /* onCancel */ () ->
+                        mAutoDeleteDaysField.setText(String.valueOf(savedDays)));
+    }
+
+    private void hideKeyboard() {
+        final InputMethodManager imm = getSystemService(InputMethodManager.class);
+        if (imm != null) imm.hideSoftInputFromWindow(mAutoDeleteDaysField.getWindowToken(), 0);
     }
 
     /**
