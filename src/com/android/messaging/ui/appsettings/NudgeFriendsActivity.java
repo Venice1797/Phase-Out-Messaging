@@ -6,9 +6,10 @@ package com.android.messaging.ui.appsettings;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spanned;
 import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
-import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.view.MenuItem;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -108,11 +109,13 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
             final float relativeSize) {
         final int start = sb.length();
         sb.append(text);
-        sb.setSpan(new StyleSpan(Typeface.BOLD), start, sb.length(),
-                SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
+        // TypefaceSpan with an explicit bold Typeface is more reliable than StyleSpan(BOLD),
+        // which depends on the base font having a bold variant available at render time.
+        sb.setSpan(new TypefaceSpan(Typeface.create(Typeface.DEFAULT, Typeface.BOLD)),
+                start, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         if (relativeSize != 1f) {
-            sb.setSpan(new RelativeSizeSpan(relativeSize), start, sb.length(),
-                    SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE);
+            sb.setSpan(new RelativeSizeSpan(relativeSize),
+                    start, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 
