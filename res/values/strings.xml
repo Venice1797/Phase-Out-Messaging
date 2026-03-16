@@ -554,7 +554,7 @@
     <string name="nudge_friends_pref_key">nudge_friends</string>
     <string name="nudge_friends_title">Nudge Friends to use Signal</string>
     <string name="safety_pref_key">safety</string>
-    <string name="safety_title">Safety</string>
+    <string name="safety_title">Privacy</string>
     <string name="auto_delete_section_title">Auto Delete</string>
     <string name="auto_delete_toggle_label">Auto Delete</string>
     <string name="auto_delete_days_label">days</string>
