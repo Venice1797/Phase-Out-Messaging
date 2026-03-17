@@ -21,6 +21,9 @@ Ready for clone/build/install/use
 Not yet ready with a prebuilt downloable APK 
 
 # Dev Notes:
+Reproducibility MUST BE a core requirement of any project. 
+
+While many open-source projects overlook installation clarity, Phase Out Messaging provides verified, step-by-step instructions. The following process has been validated on a fresh Fedora installation within a virtual machine to ensure a "clean-state" success.
 
 ## Built on:
 Fedora KDE 43
