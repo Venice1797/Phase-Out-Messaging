@@ -1,6 +1,6 @@
 Not ready yet as of 3/17/2026
 
-# Phase Out Messaging
+# Phase Out Messaging: A messaging app for Android
 Phase Out Messaging is an Android application designed to help users transition away from SMS, MMS, and RCS while maintaining their existing communication threads.
 
 # The Goal
