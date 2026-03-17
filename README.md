@@ -4,7 +4,7 @@ Updated code was uploaded on 3/16/2026
 
 
 ## Built on:
-Build on Fedora KDE 43
+Fedora KDE 43
 
 ## Tested on:
 Android pixel 8 running GrapheneOS Build 2026030701 (Android 16)
