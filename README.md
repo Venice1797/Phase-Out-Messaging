@@ -1,5 +1,3 @@
-Not ready yet as of 3/17/2026
-
 # Phase Out Messaging: A messaging app for Android
 Phase Out Messaging is an Android application designed to help users transition away from SMS, MMS, and RCS while maintaining their existing communication threads.
 
@@ -16,6 +14,11 @@ Phase Out Messaging acts as a bridge with a purpose. It serves as your SMS/MMS c
 # Targeted Platforms:
 This app is primariy for users on GrapheseOS, but should work on any Android with minSDK 35+ (Android 15+).
 I have only tested this app on GrapheneOS
+
+# Status as of 03/17/2026
+Ready for clone/build/install/use
+
+Not yet ready with a prebuilt downloable APK 
 
 # Dev Notes:
 
