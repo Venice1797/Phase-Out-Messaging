@@ -1,29 +1,45 @@
 # Phase Out Messaging: A messaging app for Android
 Phase Out Messaging is an Android application designed to help users transition away from SMS, MMS, and RCS while maintaining their existing communication threads.
 
+This project was forked from the messaging project of GrapheneOS, then extended with specific enhancments as discussed below.
+
 # The Goal
 The primary purpose of this app is to "nudge" users away from legacy, insecure messaging protocols (SMS/MMS/RCS) and toward open-source, privacy-focused alternatives like Signal.
-Why This Matters (The Motivation)
-As a GrapheneOS user, privacy and security are the top priorities. GrapheneOS offers some of the most robust privacy guards available on mobile today. However, a significant irony exists:
-    • The RCS Gap: The default messaging app on GrapheneOS lacks RCS support.
-    • The Security Paradox: While RCS is a closed-source protocol owned by a tech monopoly, it is technically more secure than the "cleartext" nature of SMS and MMS.
-    • The Dilemma: On GrapheneOS, users are often forced back to the least secure protocols (SMS/MMS) because we cannot (and should not) trust the proprietary implementations of RCS.
+
+## Why This Matters (The Motivation)
+
+As a GrapheneOS user, privacy and security are the top priorities. GrapheneOS offers some of the most robust privacy guards available on mobile today. 
+
+### However, a significant irony exists:
+
+The RCS Gap: The default messaging app on GrapheneOS lacks RCS support.
+
+The Security Paradox: While RCS is a closed-source protocol owned by a tech monopoly, it is technically more secure than the "cleartext" nature of SMS and MMS.
+
+The Dilemma: On GrapheneOS, users are often forced back to the least secure protocols (SMS/MMS) because we cannot (and should not) trust the proprietary implementations of RCS.
+
 # The Solution
-Phase Out Messaging acts as a bridge with a purpose. It serves as your SMS/MMS client on GrapheneOS, but with a built-in "nudge" mechanism. It actively encourages your contacts to stop sending insecure messages and invites them to join you on verified, open-source privacy apps—with Signal set as the default recommendation.
+The Phase Out Messaging app acts as a bridge with a purpose. 
+
+It serves as your SMS/MMS client on GrapheneOS, but with a built-in "nudge" mechanism. 
+
+It actively encourages your contacts to stop sending insecure messages and invites them to join you on verified, open-source privacy apps—with Signal set as the default recommendation.
 
 # Targeted Platforms:
 This app is primariy for users on GrapheseOS, but should work on any Android with minSDK 35+ (Android 15+).
 I have only tested this app on GrapheneOS
 
 # Status as of 03/17/2026
-Ready for clone/build/install/use
+Ready to clone/build/install/use
 
-Not yet ready with a prebuilt downloable APK 
+A prebuilt downloable APK is not yet available, but my immediate goal.
 
 # Dev Notes:
 Reproducibility MUST BE a core requirement of any project. 
 
-While many open-source projects overlook installation clarity, Phase Out Messaging provides verified, step-by-step instructions. The following process has been validated on a fresh Fedora installation within a virtual machine to ensure a "clean-state" success.
+While many open-source projects overlook build & installation clarity, Phase Out Messaging provides verified, step-by-step instructions. 
+
+The following process has been validated on a fresh Fedora installation within a virtual machine to ensure a "clean-state" success.
 
 ## Built on:
 Fedora KDE 43
