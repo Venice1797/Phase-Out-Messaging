@@ -130,6 +130,13 @@ public class ReceiveMmsMessageAction extends Action implements Parcelable {
                 db.endTransaction();
             }
 
+            // ── Auto-reply (SMS to sender only, regardless of incoming protocol) ───
+            // MMS body text is not available here (may not be downloaded yet),
+            // so incomingText is null — the <Auto Reply:> loop guard is skipped for MMS.
+            if (!blocked) {
+                AutoReplyHelper.maybeSendAutoReply(subId, from, self, null);
+            }
+
             // Update conversation if not immediately initiating a download
             if (!autoDownload) {
                 MessagingContentProvider.notifyMessagesChanged(message.getConversationId());

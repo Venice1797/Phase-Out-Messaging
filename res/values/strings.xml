@@ -563,6 +563,9 @@
     <string name="long_nudge_button">Long nudge</string>
     <string name="nudge_reset_message">Reset message</string>
     <string name="nudge_long_message_section">A longer nudge message</string>
+    <string name="auto_reply_section">Auto Reply</string>
+    <string name="auto_reply_toggle_label">Enable auto reply</string>
+    <string name="auto_reply_custom">Custom\u2026</string>
     <string name="safety_pref_key">safety</string>
     <string name="safety_title">Privacy</string>
     <string name="auto_delete_section_title">Auto delete</string>

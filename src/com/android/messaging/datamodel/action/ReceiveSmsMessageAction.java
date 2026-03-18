@@ -163,6 +163,11 @@ public class ReceiveSmsMessageAction extends Action implements Parcelable {
                     + " in conversation " + message.getConversationId()
                     + ", uri = " + messageUri);
 
+            // ── Auto-reply ────────────────────────────────────────────────
+            if (!blocked) {
+                AutoReplyHelper.maybeSendAutoReply(subId, address, self, text);
+            }
+
             actionParameters.putInt(KEY_SUB_ID, subId);
             ProcessPendingMessagesAction.scheduleProcessPendingMessagesAction(false, this);
         } else {
