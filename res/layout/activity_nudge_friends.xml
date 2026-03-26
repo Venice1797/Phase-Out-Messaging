@@ -107,12 +107,62 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Template dropdown -->
-            <Spinner
-                android:id="@+id/auto_reply_spinner"
+            <!-- Audience selector -->
+            <RadioGroup
+                android:id="@+id/auto_reply_audience_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp" />
+                android:orientation="vertical"
+                android:layout_marginBottom="8dp">
+
+                <RadioButton
+                    android:id="@+id/auto_reply_audience_everyone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/auto_reply_audience_everyone"
+                    android:checked="true" />
+
+                <RadioButton
+                    android:id="@+id/auto_reply_audience_contacts"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/auto_reply_audience_contacts" />
+
+                <RadioButton
+                    android:id="@+id/auto_reply_audience_unknowns"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/auto_reply_audience_unknowns" />
+
+            </RadioGroup>
+
+            <!-- Spinner label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/auto_reply_choose_message"
+                android:textSize="15sp"
+                android:textColor="?android:attr/textColorPrimary"
+                android:paddingBottom="4dp" />
+
+            <!-- Template dropdown -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:background="@drawable/edit_text_border">
+
+                <Spinner
+                    android:id="@+id/auto_reply_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="17dp"
+                    android:background="@drawable/spinner_background"
+                    android:paddingEnd="72dp" />
+
+            </LinearLayout>
 
             <!-- Message preview / custom text field -->
             <EditText

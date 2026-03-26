@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -49,6 +50,11 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
     public static final String PREF_AUTO_REPLY_CUSTOM    = "auto_reply_custom_message";
     /** Fully-resolved message text — read by the receive actions to send the reply. */
     public static final String PREF_AUTO_REPLY_TEXT      = "auto_reply_text";
+    /** Audience filter: 0=everyone, 1=contacts only, 2=unknowns only. */
+    public static final String PREF_AUTO_REPLY_AUDIENCE  = "auto_reply_audience";
+    public static final int AUDIENCE_EVERYONE  = 0;
+    public static final int AUDIENCE_CONTACTS  = 1;
+    public static final int AUDIENCE_UNKNOWNS  = 2;
 
     private static final String[] APPROVED_APPS = {
         "Signal", "Session", "SimpleX", "Briar", "Element"
@@ -67,6 +73,7 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
     private EditText             mLongNudgeMessageField;
     private Switch               mAutoReplyToggle;
     private LinearLayout         mAutoReplyContent;
+    private RadioGroup           mAutoReplyAudienceGroup;
     private Spinner              mAutoReplySpinner;
     private EditText             mAutoReplyMessageField;
     private ArrayAdapter<String> mAutoReplyAdapter;
@@ -218,10 +225,11 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
     // ────────────────────────────────────────────────────────────────────────
 
     private void setupAutoReply() {
-        mAutoReplyToggle       = findViewById(R.id.auto_reply_toggle);
-        mAutoReplyContent      = findViewById(R.id.auto_reply_content);
-        mAutoReplySpinner      = findViewById(R.id.auto_reply_spinner);
-        mAutoReplyMessageField = findViewById(R.id.auto_reply_message_field);
+        mAutoReplyToggle        = findViewById(R.id.auto_reply_toggle);
+        mAutoReplyContent       = findViewById(R.id.auto_reply_content);
+        mAutoReplyAudienceGroup = findViewById(R.id.auto_reply_audience_group);
+        mAutoReplySpinner       = findViewById(R.id.auto_reply_spinner);
+        mAutoReplyMessageField  = findViewById(R.id.auto_reply_message_field);
 
         // Save original key listener and input type so we can restore them for Custom mode
         mAutoReplyFieldKeyListener = mAutoReplyMessageField.getKeyListener();
@@ -236,7 +244,7 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
 
         // Build and attach spinner adapter
         mAutoReplyAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item,
+                R.layout.spinner_item_large,
                 buildAutoReplySpinnerItems(resolvedAutoReplyAppName()));
         mAutoReplyAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
@@ -261,10 +269,39 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
         // Ensure the resolved text is always current when the screen is opened
         saveResolvedAutoReplyText();
 
+        // Restore persisted audience selection
+        final int audience = prefs.getInt(PREF_AUTO_REPLY_AUDIENCE, AUDIENCE_EVERYONE);
+        final int audienceRadioId;
+        if (audience == AUDIENCE_CONTACTS) {
+            audienceRadioId = R.id.auto_reply_audience_contacts;
+        } else if (audience == AUDIENCE_UNKNOWNS) {
+            audienceRadioId = R.id.auto_reply_audience_unknowns;
+        } else {
+            audienceRadioId = R.id.auto_reply_audience_everyone;
+        }
+        mAutoReplyAudienceGroup.check(audienceRadioId);
+        mAutoReplyAudienceGroup.setEnabled(enabled);
+        setRadioGroupChildrenEnabled(mAutoReplyAudienceGroup, enabled);
+
+        // Audience listener — persist immediately
+        mAutoReplyAudienceGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            final int value;
+            if (checkedId == R.id.auto_reply_audience_contacts) {
+                value = AUDIENCE_CONTACTS;
+            } else if (checkedId == R.id.auto_reply_audience_unknowns) {
+                value = AUDIENCE_UNKNOWNS;
+            } else {
+                value = AUDIENCE_EVERYONE;
+            }
+            BuglePrefs.getApplicationPrefs().putInt(PREF_AUTO_REPLY_AUDIENCE, value);
+        });
+
         // Toggle listener
         mAutoReplyToggle.setOnCheckedChangeListener((btn, isChecked) -> {
             BuglePrefs.getApplicationPrefs().putBoolean(PREF_AUTO_REPLY_ENABLED, isChecked);
             mAutoReplyContent.setAlpha(isChecked ? 1.0f : 0.4f);
+            mAutoReplyAudienceGroup.setEnabled(isChecked);
+            setRadioGroupChildrenEnabled(mAutoReplyAudienceGroup, isChecked);
             mAutoReplySpinner.setEnabled(isChecked);
             applyAutoReplyFieldEditState(
                     mAutoReplySpinner.getSelectedItemPosition(), isChecked);
@@ -361,6 +398,13 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
             mAutoReplyMessageField.setFocusable(true);
             mAutoReplyMessageField.setFocusableInTouchMode(true);
             mAutoReplyMessageField.setCursorVisible(false);
+        }
+    }
+
+    /** Enables or disables all child RadioButtons in the group (the group itself controls alpha). */
+    private void setRadioGroupChildrenEnabled(final RadioGroup group, final boolean enabled) {
+        for (int i = 0; i < group.getChildCount(); i++) {
+            group.getChildAt(i).setEnabled(enabled);
         }
     }
 

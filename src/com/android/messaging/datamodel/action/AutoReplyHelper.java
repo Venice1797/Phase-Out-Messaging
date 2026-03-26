@@ -4,9 +4,15 @@
 
 package com.android.messaging.datamodel.action;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.ContactsContract;
 import android.text.TextUtils;
 
+import com.android.messaging.Factory;
 import com.android.messaging.datamodel.data.ParticipantData;
+import com.android.messaging.ui.appsettings.NudgeFriendsActivity;
 import com.android.messaging.util.BuglePrefs;
 
 /**
@@ -54,6 +60,17 @@ final class AutoReplyHelper {
         // Guard 5: don't reply to short codes or alpha sender IDs
         if (!isDialablePhoneNumber(senderAddress)) return;
 
+        // Guard 6: audience filter (everyone / contacts only / unknowns only)
+        final int audience = prefs.getInt(
+                NudgeFriendsActivity.PREF_AUTO_REPLY_AUDIENCE,
+                NudgeFriendsActivity.AUDIENCE_EVERYONE);
+        if (audience != NudgeFriendsActivity.AUDIENCE_EVERYONE) {
+            final Context ctx = Factory.get().getApplicationContext();
+            final boolean inContacts = isInContacts(ctx, senderAddress);
+            if (audience == NudgeFriendsActivity.AUDIENCE_CONTACTS && !inContacts) return;
+            if (audience == NudgeFriendsActivity.AUDIENCE_UNKNOWNS  &&  inContacts) return;
+        }
+
         InsertNewMessageAction.insertNewMessage(subId, senderAddress, replyText, null);
     }
 
@@ -66,6 +83,23 @@ final class AutoReplyHelper {
         final ParticipantData senderData =
                 ParticipantData.getFromRawPhoneBySimLocale(address, self.getSubId());
         return selfDest.equals(senderData.getNormalizedDestination());
+    }
+
+    /**
+     * Returns true if the given phone number matches any entry in the device contacts.
+     * Uses ContactsContract.PhoneLookup for normalised matching.
+     */
+    private static boolean isInContacts(final Context ctx, final String address) {
+        final Uri lookupUri = Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(address));
+        try (Cursor c = ctx.getContentResolver().query(
+                lookupUri,
+                new String[]{ ContactsContract.PhoneLookup._ID },
+                null, null, null)) {
+            return c != null && c.moveToFirst();
+        } catch (final Exception e) {
+            return false;
+        }
     }
 
     /**

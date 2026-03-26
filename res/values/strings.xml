@@ -566,6 +566,10 @@
     <string name="auto_reply_section">Auto Reply</string>
     <string name="auto_reply_toggle_label">Enable auto reply</string>
     <string name="auto_reply_custom">Custom\u2026</string>
+    <string name="auto_reply_audience_everyone">Send to everyone</string>
+    <string name="auto_reply_audience_contacts">Send only to my contacts</string>
+    <string name="auto_reply_audience_unknowns">Send to unknowns (not in my contacts)</string>
+    <string name="auto_reply_choose_message">Choose an auto reply message:</string>
     <string name="safety_pref_key">safety</string>
     <string name="safety_title">Privacy</string>
     <string name="auto_delete_section_title">Auto delete</string>
@@ -672,10 +676,10 @@
     <string name="reply_activity_title">Reply</string>
 
     <!-- String to show when eliding the number of participants in a conversation due to length (used when there is one extra) -->
-    <string name="plus_one">+1</string>
+    <string name="plus_one">+1\u2026</string>
 
     <!-- String to show when eliding the number of participants in a conversation due to length (used when there is more than one extra) -->
-    <string name="plus_n">+%d</string>
+    <string name="plus_n">+%d\u2026</string>
 
     <!-- Toast error shown when SMS functionality is disabled -->
     <string name="sms_disabled">SMS disabled</string>
