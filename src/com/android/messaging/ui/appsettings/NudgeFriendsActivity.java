@@ -62,6 +62,7 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
 
     private static final String[] AUTO_REPLY_TEMPLATES = {
         "<Auto Reply: I am not using SMS or MMS, please email me or contact me on %s>",
+        "<Auto Reply: Messaging on my phone is partially disabled. Please call me, email me, or contact me on %s, please include your contact info, and the purpose in reaching out to me.>",
         "<Auto Reply: Messaging on my phone is disabled. Please email me or contact me on %s>",
         "<Auto Reply: Please do not send me messages on SMS, MMS, or RCS due to security"
                 + " and privacy risks. Email me, or contact me on %s >"
