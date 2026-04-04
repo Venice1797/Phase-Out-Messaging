@@ -107,6 +107,29 @@ Connect Android device using a USB cable (high quality cable)
 
 Verify device is connected using adb, you should see your device listed as an ID
 
+If you get a permission denied, then you need to update your udev rules, here is an example using my pixel 8 device:
+```
+$ lsusb | grep -i pixel
+Bus 001 Device 005: ID 18d1:4ee7 Google Inc. Nexus/Pixel Device (charging + debug)
+So we want to edit a rules file, and add a line to it:
+sudo vim /etc/udev/rules.d/51-android.rules
+add line:
+SUBSYSTEM=="usb", ATTR{idVendor}=="18d1", MODE="0660", GROUP="plugdev", SYMLINK+="android_adb"
+save and exit
+Then...
+$ sudo udevadm control --reload-rules
+$ adb kill-server
+$ adb start-server
+$ adb devices
+List of devices attached
+3A271FDJH003GR  device
+```
+
+
+
+```
+
+
 Install:
 ```
 ./gradlew installDebug
