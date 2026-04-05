@@ -107,7 +107,7 @@ Connect Android device using a USB cable (high quality cable)
 
 Verify device is connected using adb, you should see your device listed as an ID
 
-If you get a permission denied, then you need to update your udev rules, here is an example using my pixel 8 device:
+On Fedora (43), KDE, I did not run into this problem but if you get a permission denied, then you need to update your udev rules, here is an example using my pixel 8 device:
 ```
 $ lsusb | grep -i pixel
 Bus 001 Device 005: ID 18d1:4ee7 Google Inc. Nexus/Pixel Device (charging + debug)
