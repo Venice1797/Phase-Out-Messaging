@@ -134,7 +134,7 @@ public class ReceiveMmsMessageAction extends Action implements Parcelable {
             // MMS body text is not available here (may not be downloaded yet),
             // so incomingText is null — the <Auto Reply:> loop guard is skipped for MMS.
             if (!blocked) {
-                AutoReplyHelper.maybeSendAutoReply(subId, from, self, null);
+                AutoReplyHelper.maybeSendAutoReply(subId, from, self, null, conversationId);
             }
 
             // Update conversation if not immediately initiating a download

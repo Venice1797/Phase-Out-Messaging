@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Robot head base (grayed out) -->
+    <item>
+        <vector
+            android:width="24dp"
+            android:height="24dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24"
+            android:alpha="0.4">
+            <!-- antenna stem -->
+            <path
+                android:strokeColor="#888888"
+                android:strokeWidth="1.5"
+                android:strokeLineCap="round"
+                android:pathData="M12,2 L12,5" />
+            <!-- antenna ball -->
+            <path
+                android:fillColor="#888888"
+                android:pathData="M12,2 m-1.2,0 a1.2,1.2 0 1,0 2.4,0 a1.2,1.2 0 1,0 -2.4,0" />
+            <!-- head -->
+            <path
+                android:fillColor="#888888"
+                android:pathData="M5,5.5 Q5,5 5.5,5 L18.5,5 Q19,5 19,5.5 L19,16.5 Q19,17 18.5,17 L5.5,17 Q5,17 5,16.5 Z" />
+            <!-- left eye -->
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M8,8.5 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" />
+            <!-- right eye -->
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M16,8.5 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" />
+            <!-- mouth -->
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M8,13 L16,13 L16,14.5 Q16,15 15.5,15 L8.5,15 Q8,15 8,14.5 Z" />
+            <!-- body -->
+            <path
+                android:fillColor="#888888"
+                android:pathData="M7,17 L17,17 L17,22 Q17,22.5 16.5,22.5 L7.5,22.5 Q7,22.5 7,22 Z" />
+            <!-- left arm -->
+            <path
+                android:fillColor="#888888"
+                android:pathData="M3,17.5 Q3,17 3.5,17 L7,17 L7,21 L3.5,21 Q3,21 3,20.5 Z" />
+            <!-- right arm -->
+            <path
+                android:fillColor="#888888"
+                android:pathData="M17,17 L20.5,17 Q21,17 21,17.5 L21,20.5 Q21,21 20.5,21 L17,21 Z" />
+        </vector>
+    </item>
+
+    <!-- Red X overlay, gravity bottom-right -->
+    <item
+        android:gravity="bottom|end"
+        android:width="12dp"
+        android:height="12dp">
+        <vector
+            android:width="12dp"
+            android:height="12dp"
+            android:viewportWidth="12"
+            android:viewportHeight="12">
+            <!-- red circle background -->
+            <path
+                android:fillColor="#CC0000"
+                android:pathData="M6,0 a6,6 0 1,0 0,12 a6,6 0 1,0 0,-12" />
+            <!-- X stroke 1 -->
+            <path
+                android:strokeColor="#FFFFFF"
+                android:strokeWidth="1.8"
+                android:strokeLineCap="round"
+                android:pathData="M3,3 L9,9" />
+            <!-- X stroke 2 -->
+            <path
+                android:strokeColor="#FFFFFF"
+                android:strokeWidth="1.8"
+                android:strokeLineCap="round"
+                android:pathData="M9,3 L3,9" />
+        </vector>
+    </item>
+
+</layer-list>

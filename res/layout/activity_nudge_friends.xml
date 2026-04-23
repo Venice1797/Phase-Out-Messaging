@@ -261,6 +261,26 @@
             android:textAllCaps="false"
             style="?android:attr/buttonStyle" />
 
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:background="?android:attr/listDivider" />
+
+        <!-- Clear all per-conversation auto-reply overrides -->
+        <Button
+            android:id="@+id/nudge_clear_overrides_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/auto_reply_clear_overrides_button"
+            android:backgroundTint="#CC0000"
+            android:textColor="#FFFFFF"
+            android:textAllCaps="false"
+            style="?android:attr/buttonStyle" />
+
     </LinearLayout>
 
 </ScrollView>

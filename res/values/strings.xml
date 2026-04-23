@@ -561,6 +561,11 @@
     <string name="nudge_message_section">A short nudge message</string>
     <string name="short_nudge_button">Short nudge</string>
     <string name="long_nudge_button">Long nudge</string>
+    <string name="auto_reply_toggle_content_description">Toggle auto-reply</string>
+    <string name="auto_reply_suspended_toast">Auto-reply suspended for this conversation</string>
+    <string name="auto_reply_resumed_toast">Auto-reply enabled for this conversation</string>
+    <string name="auto_reply_clear_overrides_button">Clear all auto-reply overrides</string>
+    <string name="auto_reply_overrides_cleared">All auto-reply overrides cleared</string>
     <string name="nudge_reset_message">Reset message</string>
     <string name="nudge_long_message_section">A longer nudge message</string>
     <string name="auto_reply_section">Auto Reply</string>

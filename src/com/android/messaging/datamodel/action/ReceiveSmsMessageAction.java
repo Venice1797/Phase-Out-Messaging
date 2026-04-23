@@ -165,7 +165,7 @@ public class ReceiveSmsMessageAction extends Action implements Parcelable {
 
             // ── Auto-reply ────────────────────────────────────────────────
             if (!blocked) {
-                AutoReplyHelper.maybeSendAutoReply(subId, address, self, text);
+                AutoReplyHelper.maybeSendAutoReply(subId, address, self, text, conversationId);
             }
 
             actionParameters.putInt(KEY_SUB_ID, subId);

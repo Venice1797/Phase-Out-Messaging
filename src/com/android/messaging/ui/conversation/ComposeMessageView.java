@@ -17,8 +17,10 @@ package com.android.messaging.ui.conversation;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -58,6 +60,8 @@ import com.android.messaging.sms.MmsConfig;
 import com.android.messaging.ui.AttachmentPreview;
 import com.android.messaging.ui.BugleActionBarActivity;
 import com.android.messaging.ui.PlainTextEditText;
+import com.android.messaging.ui.appsettings.NudgeFriendsActivity;
+import com.android.messaging.util.AutoReplyOverrideStore;
 import com.android.messaging.ui.conversation.ConversationInputManager.ConversationInputSink;
 import com.android.messaging.util.AccessibilityUtil;
 import com.android.messaging.util.Assert;
@@ -124,6 +128,7 @@ public class ComposeMessageView extends LinearLayout
     private ImageButton mDeleteSubjectButton;
     private android.widget.Button mShortNudgeButton;
     private android.widget.Button mLongNudgeButton;
+    private ImageButton mAutoReplyToggleButton;
     private AttachmentPreview mAttachmentPreview;
     private ImageButton mAttachMediaButton;
 
@@ -327,8 +332,7 @@ public class ComposeMessageView extends LinearLayout
                                 android.content.Context.MODE_PRIVATE);
                 final String defaultMsg = getContext().getString(R.string.nudge_privacy_app_default);
                 final String msg = prefs.getString(
-                        com.android.messaging.ui.appsettings.NudgeFriendsActivity
-                                .PREF_SHORT_NUDGE_MESSAGE,
+                        NudgeFriendsActivity.PREF_SHORT_NUDGE_MESSAGE,
                         "Reminder to contact me on " + defaultMsg
                                 + ", I will try to reply back briefly.");
                 int cursor = mComposeEditText.getSelectionStart();
@@ -352,8 +356,7 @@ public class ComposeMessageView extends LinearLayout
                         + "I\u2019ll keep replies here brief until we move our chat to "
                         + defaultApp + ".";
                 final String msg = prefs.getString(
-                        com.android.messaging.ui.appsettings.NudgeFriendsActivity
-                                .PREF_LONG_NUDGE_MESSAGE,
+                        NudgeFriendsActivity.PREF_LONG_NUDGE_MESSAGE,
                         defaultMsg);
                 int cursor = mComposeEditText.getSelectionStart();
                 if (cursor < 0) cursor = mComposeEditText.getText().length();
@@ -361,6 +364,100 @@ public class ComposeMessageView extends LinearLayout
                 mLongNudgeButton.setEnabled(false);
             }
         });
+
+        mAutoReplyToggleButton = (ImageButton) findViewById(R.id.auto_reply_toggle_button);
+        mAutoReplyToggleButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                if (mConversationDataModel == null || !mConversationDataModel.isBound()) return;
+                final String conversationId =
+                        mConversationDataModel.getData().getConversationId();
+                final boolean current = AutoReplyOverrideStore.hasOverride(
+                        getContext().getApplicationContext(), conversationId);
+                final boolean nowOverridden = !current;
+                AutoReplyOverrideStore.setOverride(
+                        getContext().getApplicationContext(), conversationId, nowOverridden);
+                android.widget.Toast.makeText(
+                        getContext(),
+                        nowOverridden
+                                ? R.string.auto_reply_suspended_toast
+                                : R.string.auto_reply_resumed_toast,
+                        android.widget.Toast.LENGTH_SHORT).show();
+                updateAutoReplyButton();
+            }
+        });
+    }
+
+    private void updateAutoReplyButton() {
+        if (mAutoReplyToggleButton == null) return;
+        if (mConversationDataModel == null || !mConversationDataModel.isBound()) {
+            mAutoReplyToggleButton.setVisibility(View.GONE);
+            return;
+        }
+        final ConversationData data = mConversationDataModel.getData();
+        if (!data.getParticipantsLoaded()) {
+            mAutoReplyToggleButton.setVisibility(View.GONE);
+            return;
+        }
+
+        // Master switch: hide button when auto-reply is globally disabled.
+        final BuglePrefs prefs = BuglePrefs.getApplicationPrefs();
+        if (!prefs.getBoolean(NudgeFriendsActivity.PREF_AUTO_REPLY_ENABLED, false)) {
+            mAutoReplyToggleButton.setVisibility(View.GONE);
+            return;
+        }
+
+        // Show button if ANY non-self participant qualifies under the audience filter.
+        final int audience = prefs.getInt(
+                NudgeFriendsActivity.PREF_AUTO_REPLY_AUDIENCE,
+                NudgeFriendsActivity.AUDIENCE_EVERYONE);
+        boolean anyQualifies = false;
+        final java.util.Iterator<com.android.messaging.datamodel.data.ParticipantData> it =
+                data.getParticipants().iterator();
+        while (it.hasNext()) {
+            final com.android.messaging.datamodel.data.ParticipantData p = it.next();
+            if (p.isSelf()) continue;
+            if (audience == NudgeFriendsActivity.AUDIENCE_EVERYONE) {
+                anyQualifies = true;
+                break;
+            }
+            final String phone = p.getSendDestination();
+            if (TextUtils.isEmpty(phone)) continue;
+            final boolean inContacts = isInContacts(phone);
+            if (audience == NudgeFriendsActivity.AUDIENCE_CONTACTS && inContacts) {
+                anyQualifies = true;
+                break;
+            }
+            if (audience == NudgeFriendsActivity.AUDIENCE_UNKNOWNS && !inContacts) {
+                anyQualifies = true;
+                break;
+            }
+        }
+        if (!anyQualifies) {
+            mAutoReplyToggleButton.setVisibility(View.GONE);
+            return;
+        }
+
+        // Icon: green robot = no override (normal rules apply),
+        //        red-X robot = override active (suppressed for this conversation).
+        final boolean overrideActive = AutoReplyOverrideStore.hasOverride(
+                getContext().getApplicationContext(), data.getConversationId());
+        mAutoReplyToggleButton.setImageResource(
+                overrideActive ? R.drawable.ic_auto_reply_off : R.drawable.ic_auto_reply_on);
+        mAutoReplyToggleButton.setVisibility(View.VISIBLE);
+    }
+
+    private boolean isInContacts(final String address) {
+        final Uri lookupUri = Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(address));
+        try (Cursor c = getContext().getContentResolver().query(
+                lookupUri,
+                new String[]{ ContactsContract.PhoneLookup._ID },
+                null, null, null)) {
+            return c != null && c.moveToFirst();
+        } catch (final Exception e) {
+            return false;
+        }
     }
 
     private void hideAttachmentsWhenShowingSims(final boolean simPickerVisible) {
@@ -870,6 +967,7 @@ public class ComposeMessageView extends LinearLayout
                     break;
             }
         }
+        updateAutoReplyButton();
     }
 
     private void setSendButtonAccessibility(final int sendWidgetMode) {

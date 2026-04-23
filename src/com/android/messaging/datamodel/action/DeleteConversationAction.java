@@ -37,6 +37,7 @@ import com.android.messaging.datamodel.MessagingContentProvider;
 import com.android.messaging.sms.MmsUtils;
 import com.android.messaging.ui.conversationlist.MultiSelectActionModeCallback.SelectedConversation;
 import com.android.messaging.util.Assert;
+import com.android.messaging.util.AutoReplyOverrideStore;
 import com.android.messaging.util.LogUtil;
 import com.android.messaging.util.NotificationChannelUtil;
 import com.android.messaging.widget.WidgetConversationProvider;
@@ -165,6 +166,8 @@ public class DeleteConversationAction extends Action implements Parcelable {
             final long threadId = BugleDatabaseOperations.getThreadId(db, conversationId);
 
             if (BugleDatabaseOperations.deleteConversation(db, conversationId, cutoffTimestamp)) {
+                AutoReplyOverrideStore.removeOverride(
+                        Factory.get().getApplicationContext(), conversationId);
                 LogUtil.i(TAG, "DeleteConversationAction: Deleted local conversation "
                         + conversationId);
 

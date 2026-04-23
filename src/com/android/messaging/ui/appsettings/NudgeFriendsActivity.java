@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 import com.android.messaging.R;
 import com.android.messaging.ui.BugleActionBarActivity;
+import com.android.messaging.util.AutoReplyOverrideStore;
 import com.android.messaging.util.BuglePrefs;
 
 import androidx.appcompat.app.AlertDialog;
@@ -216,6 +217,12 @@ public class NudgeFriendsActivity extends BugleActionBarActivity {
         });
 
         findViewById(R.id.nudge_tell_me_more_button).setOnClickListener(v -> showHelpDialog());
+
+        findViewById(R.id.nudge_clear_overrides_button).setOnClickListener(v -> {
+            AutoReplyOverrideStore.clearAll(getApplicationContext());
+            android.widget.Toast.makeText(this,
+                    R.string.auto_reply_overrides_cleared, android.widget.Toast.LENGTH_SHORT).show();
+        });
 
         // ── Auto Reply section ───────────────────────────────────────────────
         setupAutoReply();

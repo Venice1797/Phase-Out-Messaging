@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import com.android.messaging.Factory;
 import com.android.messaging.datamodel.data.ParticipantData;
 import com.android.messaging.ui.appsettings.NudgeFriendsActivity;
+import com.android.messaging.util.AutoReplyOverrideStore;
 import com.android.messaging.util.BuglePrefs;
 
 /**
@@ -25,20 +26,24 @@ import com.android.messaging.util.BuglePrefs;
  *   3. Sender is not the unknown-sender placeholder
  *   4. Sender is not our own number (self-send across SIMs)
  *   5. Sender address is a standard dialable phone number (not a short code or alpha sender ID)
+ *   6. Audience filter (everyone / contacts only / unknowns only)
+ *   7. No per-conversation override active for this thread
  */
 final class AutoReplyHelper {
 
     /**
-     * @param subId         SIM subscription ID that received the message.
-     * @param senderAddress Raw sender address from the incoming message.
-     * @param self          Self participant for the receiving SIM.
-     * @param incomingText  Body text of the incoming message, or null if unavailable (MMS).
+     * @param subId          SIM subscription ID that received the message.
+     * @param senderAddress  Raw sender address from the incoming message.
+     * @param self           Self participant for the receiving SIM.
+     * @param incomingText   Body text of the incoming message, or null if unavailable (MMS).
+     * @param conversationId Bugle conversation ID for the receiving thread.
      */
     static void maybeSendAutoReply(
             final int subId,
             final String senderAddress,
             final ParticipantData self,
-            final String incomingText) {
+            final String incomingText,
+            final String conversationId) {
 
         final BuglePrefs prefs = BuglePrefs.getApplicationPrefs();
 
@@ -60,16 +65,21 @@ final class AutoReplyHelper {
         // Guard 5: don't reply to short codes or alpha sender IDs
         if (!isDialablePhoneNumber(senderAddress)) return;
 
+        final Context ctx = Factory.get().getApplicationContext();
+
         // Guard 6: audience filter (everyone / contacts only / unknowns only)
         final int audience = prefs.getInt(
                 NudgeFriendsActivity.PREF_AUTO_REPLY_AUDIENCE,
                 NudgeFriendsActivity.AUDIENCE_EVERYONE);
         if (audience != NudgeFriendsActivity.AUDIENCE_EVERYONE) {
-            final Context ctx = Factory.get().getApplicationContext();
             final boolean inContacts = isInContacts(ctx, senderAddress);
             if (audience == NudgeFriendsActivity.AUDIENCE_CONTACTS && !inContacts) return;
             if (audience == NudgeFriendsActivity.AUDIENCE_UNKNOWNS  &&  inContacts) return;
         }
+
+        // Guard 7: per-conversation override (user suppressed auto-reply for this thread)
+        if (!TextUtils.isEmpty(conversationId)
+                && AutoReplyOverrideStore.hasOverride(ctx, conversationId)) return;
 
         InsertNewMessageAction.insertNewMessage(subId, senderAddress, replyText, null);
     }
