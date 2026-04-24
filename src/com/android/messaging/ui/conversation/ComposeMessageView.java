@@ -32,6 +32,8 @@ import android.text.format.Formatter;
 import android.util.AttributeSet;
 import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.inputmethod.EditorInfo;
@@ -377,12 +379,9 @@ public class ComposeMessageView extends LinearLayout
                 final boolean nowOverridden = !current;
                 AutoReplyOverrideStore.setOverride(
                         getContext().getApplicationContext(), conversationId, nowOverridden);
-                android.widget.Toast.makeText(
-                        getContext(),
-                        nowOverridden
-                                ? R.string.auto_reply_suspended_toast
-                                : R.string.auto_reply_resumed_toast,
-                        android.widget.Toast.LENGTH_SHORT).show();
+                showStyledToast(nowOverridden
+                        ? R.string.auto_reply_suspended_toast
+                        : R.string.auto_reply_resumed_toast);
                 updateAutoReplyButton();
             }
         });
@@ -1164,5 +1163,25 @@ public class ComposeMessageView extends LinearLayout
             mSendButton.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
             mAttachMediaButton.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
         }
+    }
+
+    private void showStyledToast(final int messageResId) {
+        final View toastView = LayoutInflater.from(getContext())
+                .inflate(R.layout.toast_custom, null);
+        ((android.widget.TextView) toastView.findViewById(R.id.toast_text))
+                .setText(messageResId);
+        final android.widget.Toast toast = new android.widget.Toast(getContext());
+        toast.setView(toastView);
+        toast.setDuration(android.widget.Toast.LENGTH_SHORT);
+
+        // Place the bottom of the toast at the vertical midpoint of the nudge buttons.
+        // Use window-relative coordinates (excludes status bar) so the reference frame
+        // matches what Gravity.BOTTOM uses when positioning the toast.
+        final int[] loc = new int[2];
+        mShortNudgeButton.getLocationInWindow(loc);
+        final int buttonMidY = loc[1] + mShortNudgeButton.getHeight() / 2;
+        final int windowHeight = getRootView().getHeight();
+        toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, windowHeight - buttonMidY);
+        toast.show();
     }
 }
