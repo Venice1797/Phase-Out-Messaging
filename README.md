@@ -140,6 +140,9 @@ MIT License
 
 # Screenshots
 See files under folder: Screenshots
+Example:
+![Text](./Screenshots/Screenshot-1.png)
+
 
 
 
