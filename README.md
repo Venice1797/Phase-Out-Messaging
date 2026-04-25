@@ -125,24 +125,15 @@ List of devices attached
 3A271FDJH003GR  device
 ```
 
-
-
-```
-
-
 Install:
 ```
 ./gradlew installDebug
+
 ```
 
 # License
 MIT License
 
 # Screenshots
-See files under folder: Screenshots
-Example:
-![Text](./Screenshots/Screenshot-1.png)
-
-
-
+See files under folder Screenshots
 
