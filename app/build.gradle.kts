@@ -21,8 +21,8 @@ android {
 
     defaultConfig {
         applicationId = "com.po.messaging"
-        versionCode = 20000000 + 17
-        versionName = "14.3"
+        versionCode = 20000000 + 18
+        versionName = "14.4"
         minSdk = 35
         targetSdk = 35
 

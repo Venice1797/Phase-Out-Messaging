@@ -14,6 +14,7 @@ import com.android.messaging.Factory;
 import com.android.messaging.datamodel.data.ParticipantData;
 import com.android.messaging.ui.appsettings.NudgeFriendsActivity;
 import com.android.messaging.util.AutoReplyOverrideStore;
+import com.android.messaging.util.AutoReplySenderRateLimit;
 import com.android.messaging.util.BuglePrefs;
 
 /**
@@ -28,6 +29,7 @@ import com.android.messaging.util.BuglePrefs;
  *   5. Sender address is a standard dialable phone number (not a short code or alpha sender ID)
  *   6. Audience filter (everyone / contacts only / unknowns only)
  *   7. No per-conversation override active for this thread
+ *   8. No auto-reply sent to this sender within the last hour (rate-limit / MMS loop prevention)
  */
 final class AutoReplyHelper {
 
@@ -81,6 +83,11 @@ final class AutoReplyHelper {
         if (!TextUtils.isEmpty(conversationId)
                 && AutoReplyOverrideStore.hasOverride(ctx, conversationId)) return;
 
+        // Guard 8: rate-limit — suppress if a reply was already sent to this sender within 1 hour.
+        // Prevents MMS loops where Guard 2 cannot fire (body unavailable at receive time).
+        if (AutoReplySenderRateLimit.isRateLimited(ctx, senderAddress)) return;
+
+        AutoReplySenderRateLimit.record(ctx, senderAddress);
         InsertNewMessageAction.insertNewMessage(subId, senderAddress, replyText, null);
     }
 
